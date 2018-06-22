@@ -40,7 +40,7 @@ class App extends Component {
   test() {
     function login(callback) {
       var CLIENT_ID = 'e0ec0666abbe4d258cafddd3c622b045';
-      var REDIRECT_URI = 'http://saschamz.github.io/playlistify';
+      var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
       function getLoginURL(scopes) {
           return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
             '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
