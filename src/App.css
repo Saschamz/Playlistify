@@ -4,28 +4,48 @@
 
 .login-button {
   position: absolute;
+  cursor: pointer;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 250px;
+  height: 100vh;
   width: 100vw;
 }
 
-.login-button path:first-child {
-  fill: var(--spotify-green) !important;
+.login-button > p {
+  font-size: 42px;
+  color: hsl(0,0%,70%);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .login-title {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(calc(-50% - 125px), 0%);
+}
+
+.login-title path:first-child {
+  fill: var(--spotify-green) !important;
+}
+
+.login-title svg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(100%, -25%);
+}
+
+.login-title > h1 {
   color: var(--spotify-green);
   font-size: 100px;
   text-align: center;
-  position: absolute;
-  top: calc(50% - 350px);
-  left: 50%;
-  transform: translate(-50%, 0%);
 }
 
-.login-title > span {
+.login-title span {
   position: absolute;
   font-size: 20px;
   opacity: .7;
@@ -39,18 +59,6 @@
   color: hsla(0,0%,100%, .6);
   font-weight: 400;
   font-size: 24px;
-}
-
-
-
-@keyframes pulsate {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.2);
-  }
 }
 
 .layout__grid {

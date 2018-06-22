@@ -96,13 +96,12 @@ class App extends Component {
   renderLogin() {
     return (
       <div>
-        <h1 className="login-title">Playlistify<br/><span>The best playlist generator available.</span></h1>
+        <div className="login-title">
+        <h1>Playlistify<br/><span>The best playlist generator available.</span></h1>
+        {svg}
+        </div>
         <div className="login-button" id="btn-login">
-          {/* <a href="http://localhost:8888">
-            {svg}
-          </a> */}
-          {svg}
-          {/* <h4>Press the icon to log in</h4> */}
+          <p>Click anywhere to login</p>
         </div>
       </div>
     );
