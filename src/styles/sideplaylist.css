@@ -1,0 +1,58 @@
+.side-playlist {
+    background: hsl(0,0%,3%);
+    padding: 20px;
+    box-shadow: inset -12px 0 8px -2px rgba(0,0,0,0.1);
+    text-align: left;
+    direction: rtl;
+    user-select: none;
+}
+
+.side-playlist__item {
+    color: #999;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 5px 10px;
+    /* border-bottom: 1px solid rgba(255,255,255,.05); */
+    user-select: none;
+}
+
+.side-playlist__item:hover {
+    color: white;
+}
+
+.playlists-title {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+.active {
+    color: white;
+    border-left: 5px solid var(--spotify-green);
+}
+
+.side-playlist__container {
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.side-playlist__header {
+    position: relative;
+    text-align: center;
+    user-select: none;
+}
+
+.spotifind-title {
+    color: var(--spotify-green);
+    font-weight: 600;
+    font-size: 42px;
+}
+
+.spotifind-title__subtitle {
+    color: white;
+    margin: 0;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+}
