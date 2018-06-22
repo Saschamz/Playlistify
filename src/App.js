@@ -49,7 +49,7 @@ class App extends Component {
       }
       
       var url = getLoginURL([
-          'user-read-email'
+          'user-read-private user-read-email user-read-playback-state playlist-modify-public'
       ]);
       
 
