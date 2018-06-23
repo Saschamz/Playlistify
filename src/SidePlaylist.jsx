@@ -78,7 +78,10 @@ class SidePlaylist extends Component {
         // If !isOnCd render button
         if(!isOnCd) {
             return (
-                <div className="weekly"><button className="weekly-button" onClick={this.handleWeekly.bind(this)}>Create weekly playlist</button></div>
+                <div className="weekly">
+                <button className="weekly-button" onClick={this.handleWeekly.bind(this)}>Create weekly playlist</button>
+                <p>Only works for active users</p>
+                </div>
             );
         }
     }
