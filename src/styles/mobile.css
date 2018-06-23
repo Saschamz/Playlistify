@@ -1,6 +1,7 @@
 @media (max-width: 768px) {
     .layout__grid {
       grid-template-columns: 0fr 1fr !important;
+      height: 100%;
     }
   
     .layout__grid > div:first-child {
@@ -21,23 +22,29 @@
 
     .login-title {
       font-size: 62px !important;
-      width: 100%;
-      top: 80px !important;
+      width: 100vw;
+      top: 10% !important;
+      left: 0 !important;
+      text-align: center;
+      transform: translate(0,0) !important;
     }
 
-    .login-title > span {
+    .login-title svg {display: none}
+
+    .login-title h1 {
+      font-size: 62px !important;
+    }
+
+    .login-title span {
       width: 100%;
       text-align: center;
+      transform: translateY(5px);
       left: 0;
     }
 
-    .login-button {
-      top: 50% !important;
-    }
-
-    .login-button h4 {
+    .login-button p {
+      font-size: 22px !important;
       width: 100%;
       text-align: center;
-      font-size: 20px !important;
     }
   }

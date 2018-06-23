@@ -28,19 +28,32 @@ export default class PlayListGenerator extends Component {
     }
     
     componentDidUpdate() {
-        if(this.props.nowPlaying && this.props.nowPlaying !== this.state.playlistUri) { 
+        if(this.props.nowPlaying && !this.state.playlistLoading && this.props.nowPlaying !== this.state.playlistUri) { 
             console.log(this.props.nowPlaying);
             this.setState({userInformation: this.state.userInformation, playlistLoading: true, 
                 playlistReady: true, playlistUri: this.props.nowPlaying, algorithm: this.state.algorithm});
+        }
+        if(this.state.playlistLoading) {
+            let svg = document.querySelector('.svg__spotify--stripes');
+            !svg.classList.contains('svg__spotify--stripes--loading') && (
+                document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading')
+            );
         }
     }
 
     requestPlaylist(e) {
         e.preventDefault();
 
+        this.setState({
+            userInformation: this.state.userInformation,
+            playlistLoading: true,
+            playlistReady: false,
+            playlistUri: this.state.uri,
+            algorithm: this.state.algorithm
+        });
+        //document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
         // Get the input value
         let input = document.querySelector('input[type=text]').value;
-        //this.quickFix();
 
         // Create the playlist
         api.createPlaylist(this.state.userInformation.id, input)
@@ -79,15 +92,9 @@ export default class PlayListGenerator extends Component {
             }
         });
         
-        
         //Reset input
         document.querySelector('input[type=text]').value = '';
-        document.querySelector('input[type=submit]').classList.add('inactive');
-
-        //const playlist = [];
-        //artists.forEach(artist => playlist.push(api.addToPlaylist(artist)));
-        
-
+        document.querySelector('input[type=submit]').classList.add('inactive');        
     }
 
     handleChange() {
@@ -102,7 +109,7 @@ export default class PlayListGenerator extends Component {
 
     renderPlayList() {
         return (
-            <iframe src={`https://open.spotify.com/embed?uri=${this.props.nowPlaying}`} className="playlist" frameBorder="0" allow="encrypted-media"></iframe>
+            <iframe title="Playlist" src={`https://open.spotify.com/embed?uri=${this.props.nowPlaying}`} className="playlist" frameBorder="0" allow="encrypted-media"></iframe>
         );
     }
 
@@ -145,7 +152,7 @@ export default class PlayListGenerator extends Component {
                 {this.state.playlistReady && this.renderPlayList()}
                 </div>
                 {svg}
-                <footer>Created by Sascha Ringström | sascharingstrom@gmail.com </footer>
+                <footer>Created by Sascha Ringström | <a href="mailto:sascharingstrom@gmail.com">sascharingstrom@gmail.com</a> </footer>
             </div>
         );
     }

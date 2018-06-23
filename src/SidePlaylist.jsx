@@ -17,7 +17,6 @@ class SidePlaylist extends Component {
     }
     
     componentDidUpdate() {
-        console.log(this.props.user)
         if(this.props.nowPlaying) {
             let toggle = true;
             this.state.playlists.forEach(item => {
@@ -39,8 +38,49 @@ class SidePlaylist extends Component {
     }
 
     updatePlaying(e) {
+        document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
         const uri = e.target.attributes[1].value;
         this.props.updatePlaying(uri);
+    }
+
+    handleWeekly(e) {
+        e.preventDefault();
+
+        document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
+
+        // Create playlist
+        api.createPlaylist(this.props.user.id, 'Weekly')
+        .then((res, err) => {
+            if(err) console.log(err);
+            else {
+                api.weeklyAlgorithm(this.props.user.id, res.uri);
+                setTimeout(() => {
+                    this.props.updatePlaying(res.uri)
+                }, 2000);
+            }
+        })
+
+        // Update cooldown
+        let cooldown = Date.now();
+        localStorage.setItem('weeklyCooldown', JSON.stringify(cooldown));
+
+        // Animate out button
+        let weekly = document.querySelector('.weekly');
+        weekly.classList.add('weekly--bye');
+    }
+
+    weeklyButton() {
+        // Get cooldown
+        let cooldown = JSON.parse(localStorage.getItem('weeklyCooldown')) || localStorage.setItem('weeklyCooldown', JSON.stringify(0));
+        !cooldown && ( cooldown = 0 );
+        const isOnCd = cooldown >= ( Date.now() - 7*24*3600*1000 );
+
+        // If !isOnCd render button
+        if(!isOnCd) {
+            return (
+                <div className="weekly"><button className="weekly-button" onClick={this.handleWeekly.bind(this)}>Create weekly playlist</button></div>
+            );
+        }
     }
 
     render() {
@@ -60,6 +100,7 @@ class SidePlaylist extends Component {
                     );
                 })}
                 </div>
+                {this.weeklyButton()}
             </div>
         );
     }

@@ -115,7 +115,21 @@ input[type="submit"].inactive::before {
 }
 
 .svg__spotify > g > path:first-child {fill: #333;}
-.svg__spotify > g > path:nth-child(2) {fill: #111;}
+.svg__spotify--stripes {fill: #111;}
+
+.svg__spotify--stripes--loading {
+    animation: loading .5s forwards alternate infinite;
+}
+
+@keyframes loading {
+    0% {
+        fill: #111;
+    }
+
+    100% {
+        fill: var(--spotify-green);
+    }
+}
 
 .no-shadow {box-shadow: none;}
 
@@ -180,4 +194,8 @@ footer {
     font-weight: 600;
     font-size: 18px;
     user-select: none;
+}
+
+footer > a {
+    color: hsl(0,0%,25%);
 }

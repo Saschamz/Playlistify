@@ -27,9 +27,6 @@ export default class FullView extends Component {
     }
 
     componentDidUpdate() {
-        let form = document.querySelector('.input-field__form');
-        //this.state.playing ? ( setTimeout(() => form.classList.add('no-shadow'), 1200) ) : ( form.classList.remove('no-shadow') );
-        //this.state.playing && ( document.querySelector('.algorithm-choices').style.height = '0px' );
         this.state.playing && !this.state.expanded && this.contract();
     }
 

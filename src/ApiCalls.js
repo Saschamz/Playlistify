@@ -1,7 +1,7 @@
 import { searchAlgorithm, halfTopTracks } from './SearchAlgorithm';
-const Spotify = require('spotify-web-api-js');
+//const Spotify = require('spotify-web-api-js');
 const SpotifyWebApi = require('spotify-web-api-js');
-const s = new Spotify();
+//const s = new Spotify();
 
 const limit = 5; // This affects how many related artists are retrieved per search
 // One artist results in 5*10 = 50 songs per playlist
@@ -147,7 +147,7 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
 
                     allTracks.forEach((_, index) => {
                         if(index !== 0 && index % 100 === 0) {
-                            let payload = allTracks.slice(0, index);
+                            let payload = allTracks.slice(index - 100, index);
                             this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                             .then((res, err) => {
                                 if(err) console.error(err);
@@ -168,7 +168,10 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
             related.forEach(relatedArtist => {
                 this.spotify.getArtistRelatedArtists(relatedArtist.id)
                 .then((res, err) => {
-                    if(err) console.error(err);
+                    if(err) playlistLength -= 20;
+                    else {
+
+                    
                     let relatedRelated = res.artists;
 
                     // Experimental
@@ -184,17 +187,94 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                     _payload.forEach(relatedRelatedArtist => {
                         this.spotify.getArtistTopTracks(relatedRelatedArtist, 'SE')
                         .then((res, err) => {
-                            if(err) console.error(err);
-                            let track = res.tracks[0].uri;
-                            if(allTracks.includes(track)) {
-                                --playlistLength;
-                            } else {
-                                allTracks.push(track);
+                            if(err) --playlistLength;
+                            else {
+                                let track = res.tracks[0].uri;
+                                if(allTracks.includes(track)) {
+                                    --playlistLength;
+                                } else {
+                                    allTracks.push(track);
+                                }
                             }
                         });
                     });
-                });
+                }});
+                
             });
         })
     })  
+}
+// Weekly algopithm
+// User top artists > Related > Top tracks(1)
+api.weeklyAlgorithm = (user_id, playlist_id) => {
+    playlist_id = playlist_id.split(':');
+    playlist_id = playlist_id[playlist_id.length - 1];
+    this.spotify.getMyTopArtists()
+    .then((res, err) => {
+        if(err) console.error(err);
+        console.log(res);
+        let artists = res.items;
+        const ogArtists = [];
+        artists.forEach(artist => ogArtists.push(artist.id));
+        
+        let allTracks = [];
+        let playlistLength = 400;
+
+        const update = setInterval(() => {
+            console.log(allTracks.length, playlistLength);
+            if(allTracks.length === playlistLength) {
+                console.log(allTracks);
+                clearInterval(update);
+
+                allTracks.forEach((_, index) => {
+                    if(index !== 0 && index % 100 === 0) {
+                        let payload = allTracks.slice(index - 100, index);
+                        this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                        .then((res, err) => {
+                            if(err) console.error(err);
+                        })
+                    } else if(index + 1 === allTracks.length) {
+                        let payload = allTracks.slice(Math.floor(index / 100) * 100, index + 1);
+                        this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                        .then((res, err) => {
+                            if(err) console.error(err);
+                        })
+                    }
+                });
+            }
+        }, 10);
+
+        const finalArtists = [];
+
+        artists.forEach(topArtist => {
+            this.spotify.getArtistRelatedArtists(topArtist.id)
+            .then((res, err) => {
+                if(err) console.error(err);
+                let related = res.artists;
+
+                let _payload = [];
+                related.forEach(_artist => {
+                    if(finalArtists.includes(_artist.id) || ogArtists.includes(_artist.id)) {
+                        --playlistLength;
+                    } else {
+                        finalArtists.push(_artist.id) && _payload.push(_artist.id);
+                    }
+                });
+
+                _payload.forEach(artist => {
+                    this.spotify.getArtistTopTracks(artist, 'SE')
+                    .then((res, err) => {
+                        if(err) --playlistLength;
+                        let track = res.tracks[0].uri;
+                        if(allTracks.includes(track)) {
+                            --playlistLength;
+                        } else {
+                            allTracks.push(track);
+                        }
+                    });
+                });
+
+            });
+        });
+    });
 }
