@@ -1,4 +1,4 @@
-import { searchAlgorithm, halfTopTracks } from './SearchAlgorithm';
+import { searchAlgorithm, halfTopTracks, cousinFilter } from './SearchAlgorithm';
 //const Spotify = require('spotify-web-api-js');
 const SpotifyWebApi = require('spotify-web-api-js');
 //const s = new Spotify();
@@ -158,6 +158,27 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                             .then((res, err) => {
                                 if(err) console.error(err);
                             })
+                            .catch(e => {
+                                console.log('Error creating playlist');
+                                
+                                    setTimeout(() => {
+                                        allTracks.forEach((_, index) => {
+                                            if(index !== 0 && index % 100 === 0) {
+                                                let payload = allTracks.slice(index - 100, index);
+                                                this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                                                .then((res, err) => {
+                                                    if(err) console.error(err);
+                                                })
+                                            } else if(index + 1 === allTracks.length) {
+                                                let payload = allTracks.slice(Math.floor(index / 100) * 100, index + 1);
+                                                this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                                                .then((res, err) => {
+                                                    if(err) console.error(err);
+                                                })
+                                            }})
+                                    }, 5000);
+                                
+                            })
                         }
                     });
                 }
@@ -189,14 +210,18 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                         .then((res, err) => {
                             if(err) --playlistLength;
                             else {
-                                let track = res.tracks[0].uri;
+                                //console.log('alpha: ', relatedRelatedArtist);
+                                //let track = res.tracks[0].uri;
+                                let track = cousinFilter(res.tracks, res.tracks[0].artists[0].name);
+                                //console.log('beta: ', track);
                                 if(allTracks.includes(track)) {
                                     --playlistLength;
                                 } else {
                                     allTracks.push(track);
                                 }
                             }
-                        });
+                        })
+                        .catch(_ => --playlistLength);
                     });
                 }});
                 

@@ -46,10 +46,17 @@ class SidePlaylist extends Component {
     handleWeekly(e) {
         e.preventDefault();
 
+        Date.prototype.getWeek = function() {
+            var onejan = new Date(this.getFullYear(), 0, 1);
+            return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+        }
+    
+        var weekNumber = (new Date()).getWeek();
+
         document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
 
         // Create playlist
-        api.createPlaylist(this.props.user.id, 'Weekly')
+        api.createPlaylist(this.props.user.id, `Week ${weekNumber}`)
         .then((res, err) => {
             if(err) console.log(err);
             else {

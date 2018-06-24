@@ -144,7 +144,7 @@ export default class PlayListGenerator extends Component {
                             </div>
                             <div className="algorithm-choice" id="cousin" onClick={this.changeAlgorithm.bind(this)}>
                                 <h3>Cousin Algorithm</h3>
-                                <p>Creates an experimental playlists with zero reoccuring artists.</p>
+                                <p>Creates a less reliable playlist with zero reoccuring artists.</p>
                             </div>
                         </div>
                         <input className="input-field__form__submit inactive" type="submit" value="Create Playlist"/>

@@ -39,6 +39,7 @@ export function searchAlgorithm(data, limit) {
     return results;
 }
 
+// Used for the sibling algorithm
 export function halfTopTracks(tracks, artist) {
 
     // Retrieve history or create if non existant
@@ -74,4 +75,45 @@ export function halfTopTracks(tracks, artist) {
     localStorage.setItem('history', JSON.stringify(history));
 
     return tracks;
+}
+
+// Used for the cousin algorithm
+export function cousinFilter(tracks, artist) {
+
+    // Retrieve history or create if non existant
+    let history = JSON.parse(localStorage.getItem('history_cousin')) || localStorage.setItem('history_cousin', JSON.stringify([]));
+
+    // Perform input validation
+    !Array.isArray(history) && ( history = [] );
+
+    // Check if artist exists in history
+    let isInHistory = false;
+    let existingArtist;
+    history.forEach((historyArtist, index) => {
+        if(historyArtist.name === artist) {
+            isInHistory = true;
+            existingArtist = historyArtist;
+            if(history[index].index === 10) history[index].index = 0 && ( existingArtist.index = 0 );
+            else ++history[index].index;
+        }
+    });
+
+    // Decide which half of the top10 tracks to return
+    if(isInHistory && existingArtist.index > 0) {
+        tracks = tracks.slice(existingArtist.index - 1, existingArtist.index);
+    } else if(isInHistory && existingArtist.index === 0 ) {
+        tracks = tracks.slice(tracks.length - 1, tracks.length);
+    } else {
+        tracks = tracks.slice(0, 1);
+        const artistHistory = {
+            name: artist,
+            index: 10
+        }
+        history.push(artistHistory);
+    }
+
+    // Add new artists to history, update current artists state and return the results
+    localStorage.setItem('history_cousin', JSON.stringify(history));
+
+    return tracks[0].uri;
 }
