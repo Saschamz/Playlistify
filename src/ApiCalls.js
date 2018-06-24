@@ -135,9 +135,10 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
         .then((res, err) => {
             if(err) console.error(err);
             const related = res.artists;
+            console.log('Found related: ', related.length);
 
             let allTracks = [];
-            let playlistLength = 400;
+            let playlistLength = related.length * 20;
 
             const update = setInterval(() => {
                 console.log(allTracks.length, playlistLength);
@@ -194,6 +195,8 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
 
                     
                     let relatedRelated = res.artists;
+                    console.log('Found related: ', relatedRelated.length);
+                    if(relatedRelated.length != 20) playlistLength -= (20 - relatedRelated.length);
 
                     // Experimental
                     let _payload = [];
@@ -213,6 +216,7 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                                 //console.log('alpha: ', relatedRelatedArtist);
                                 //let track = res.tracks[0].uri;
                                 let track = cousinFilter(res.tracks, res.tracks[0].artists[0].name);
+                                !track && ( track = res.tracks[0] );
                                 //console.log('beta: ', track);
                                 if(allTracks.includes(track)) {
                                     --playlistLength;
