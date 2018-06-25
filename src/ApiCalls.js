@@ -63,14 +63,63 @@ api.userInformation = () => {
     return this.spotify.getMe();
 };
 
+api.capital_letter = (str) => {
+    str = str.split(" ");
+
+    for (var i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+    return str.join(" ");
+}
+
 api.createPlaylist = (user_id, name) => {
-    name = 'Playlistify: ' + name;
+    name = 'Playlistify: ' + api.capital_letter(name);
     return this.spotify.createPlaylist(user_id, {name, description: this.descriptionString});
 };
 
 api.getPlaylists = () => {
     return this.spotify.getUserPlaylists();
 }
+
+
+/*
+* WIP WIP WIP
+* Below are endpoints for the player
+* WIP WIP WIP
+*/
+
+api.getPlayBack = () => {
+    return this.spotify.getMyCurrentPlayBackState();
+}
+
+// Send a context_uri if playlist is not playing
+api.play = (context_uri = false) => {
+    context_uri ? this.spotify.play({context_uri}) : this.spotify.play();
+}
+
+api.pause = () => {
+    return this.spotify.pause();
+}
+
+api.next = () => {
+    return this.spotify.skipToNext();
+}
+
+api.previous = () => {
+    return this.spotify.skipToPrevious();
+}
+
+// volume_percent: 0-100
+api.volume = (volume_percent) => {
+    return this.spotify.setVolume(+volume_percent);
+}
+
+// state: boolean
+api.shuffle = (state) => {
+    return this.spotify.setShuffle(state);
+}
+
 
 // Sibling Algorithm
 // Artist > Related Artists > Top Tracks(5)
@@ -233,6 +282,7 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
         })
     })  
 }
+
 // Weekly algopithm
 // User top artists > Related > Top tracks(1)
 api.weeklyAlgorithm = (user_id, playlist_id) => {

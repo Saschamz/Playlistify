@@ -1,6 +1,7 @@
 @import './styles/playlist.css';
 @import './styles/sideplaylist.css';
 @import './styles/weeklybutton.css';
+@import './styles/splashscreen.css';
 @import './styles/mobile.css';
 
 .login-button {
