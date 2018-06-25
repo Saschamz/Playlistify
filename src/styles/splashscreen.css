@@ -2,7 +2,16 @@
 * Statistics
 */
 
+.statistics__stat__header {
+    font-size: 24px;
+    font-weight: 600;
+}
 
+.statistics__stat__tooltip {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
 
 
 /*
