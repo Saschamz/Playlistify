@@ -115,5 +115,6 @@ export function cousinFilter(tracks, artist) {
     // Add new artists to history, update current artists state and return the results
     localStorage.setItem('history_cousin', JSON.stringify(history));
 
+    console.log('returning track', tracks[0].uri);
     return tracks[0].uri;
 }

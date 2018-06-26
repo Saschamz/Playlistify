@@ -110,7 +110,7 @@ class SidePlaylist extends Component {
                     );
                 })}
                 </div>
-                {this.weeklyButton()}
+                {/* {this.weeklyButton()} */}
             </div>
         );
     }

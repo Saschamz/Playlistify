@@ -36,9 +36,38 @@ export default class PlayListGenerator extends Component {
         if(this.state.playlistLoading) {
             let svg = document.querySelector('.svg__spotify--stripes');
             !svg.classList.contains('svg__spotify--stripes--loading') && (
-                document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading')
-            );
+                svg.classList.add('svg__spotify--stripes--loading')
+            ) ;
         }
+    }
+
+    onSuccess(uri) {
+        console.log('Triggered onSucess');
+        this.props.updatePlaying(uri);
+        this.setState({
+            userInformation: this.state.userInformation,
+            playlistLoading: true,
+            playlistReady: true,
+            playlistUri: uri,
+            algorithm: this.state.algorithm
+        });
+    }
+
+    onFailure() {
+        console.log('Triggered onFailure')
+        let stripes = document.querySelector('.svg__spotify--stripes');
+        stripes.classList.remove('svg__spotify--stripes--loading');
+        stripes.classList.add('svg__spotify--stripes--error');
+        setTimeout(() => {
+            stripes.classList.remove('svg__spotify--stripes--error');
+        }, 1200);
+        this.setState({
+            userInformation: this.state.userInformation,
+            playlistLoading: false,
+            playlistReady: false,
+            playlistUri: this.state.playlistLoading,
+            algorithm: this.state.algorithm
+        });
     }
 
     requestPlaylist(e) {
@@ -60,18 +89,6 @@ export default class PlayListGenerator extends Component {
         .then((res, err) => {
             if(err) console.log(err);
             else {
-                setTimeout(() => {
-                    this.props.updatePlaying(res.uri)
-                    this.setState({
-                        userInformation: this.state.userInformation,
-                        playlistLoading: true,
-                        playlistReady: true,
-                        playlistUri: res.uri,
-                        algorithm: this.state.algorithm
-                    });
-                }, 2000);
-
-                
                 // Fill the playlist
                 let artists = input.split(',');
                 console.log('Searching for ', artists);
@@ -79,11 +96,24 @@ export default class PlayListGenerator extends Component {
                 //trim foreach
                 switch(this.state.algorithm) {
                     case 'sibling':
-                    artists.forEach(artist => api.entireFlow(artist, this.props.user.id, res.uri));
+                    artists.forEach(artist => api.siblingAlgorithm(
+                        artist, 
+                        this.props.user.id, 
+                        res.uri, 
+                        () => this.onSuccess(res.uri),
+                        () => this.onFailure()
+                    ));
                     break;
 
                     case 'cousin':
-                    artists.forEach(artist => api.cousinAlgorithm(artist, this.props.user.id, res.uri));
+                    artists.forEach(artist => api.cousinAlgorithm(
+                        artist, 
+                        this.props.user.id, 
+                        res.uri, 
+                        () => this.onSuccess(res.uri),
+                        () => this.onFailure()
+
+                    ));
                     break;
 
                     default:

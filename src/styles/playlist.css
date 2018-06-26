@@ -100,7 +100,6 @@ input[type="submit"].inactive::before {
     left: 0;
     transition: transform var(--transition);
     transform: translateY(calc(100% + 60px));
-/*    transform: translateY(60px); */ 
 }
 
 .svg__spotify {
@@ -111,7 +110,6 @@ input[type="submit"].inactive::before {
     transform-origin: center;
     z-index: -1;
     transform: translate(-50%, -50%);
-    /*animation: _pulsate .5s alternate infinite;*/
 }
 
 .svg__spotify > g > path:first-child {fill: #333;}
@@ -121,6 +119,10 @@ input[type="submit"].inactive::before {
     animation: loading .5s forwards alternate infinite;
 }
 
+.svg__spotify--stripes--error {
+    animation: error .15s forwards alternate 6;
+}
+
 @keyframes loading {
     0% {
         fill: #111;
@@ -128,6 +130,16 @@ input[type="submit"].inactive::before {
 
     100% {
         fill: var(--spotify-green);
+    }
+}
+
+@keyframes error {
+    0% {
+        fill: #111;
+    }
+
+    100% {
+        fill: hsl(0, 67%, 49%);
     }
 }
 

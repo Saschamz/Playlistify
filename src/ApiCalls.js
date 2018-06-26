@@ -123,14 +123,18 @@ api.shuffle = (state) => {
 
 // Sibling Algorithm
 // Artist > Related Artists > Top Tracks(5)
-api.entireFlow = (artist, user_id, playlist_id) => {
+api.siblingAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
     this.spotify.search(artist, ['artist'])
     .then((res, err) => {
         if(err) console.error(err);
+        if(!res.artists.items[0]) {
+            failure();
+        } else {
         this.spotify.getArtistRelatedArtists(res.artists.items[0].id)
         .then((res, err) => {
             if(err) console.error(err);
             const related = res.artists;
+
 
             let allTracks = [];
             const update = setInterval(() => {
@@ -149,6 +153,7 @@ api.entireFlow = (artist, user_id, playlist_id) => {
                             this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                             .then((res, err) => {
                                 if(err) console.error(err);
+                                else if(index + 1 === allTracks.length) callback();
                             })
                         }
                     });
@@ -168,18 +173,23 @@ api.entireFlow = (artist, user_id, playlist_id) => {
                     res.tracks.forEach(track => tracks.push(track.uri));
                 })
             })
+        
         })
+    }
     })
+    
 }
 
 // Cousin Algorithm
 // Artist > Related Artists > Related Artists > Top Tracks(1)
-api.cousinAlgorithm = (artist, user_id, playlist_id) => {
+api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
     playlist_id = playlist_id.split(':');
     playlist_id = playlist_id[playlist_id.length - 1];
     this.spotify.search(artist, ['artist'])
     .then((res, err) => {
         if(err) console.error(err);
+        if(!res.artists.items[0]) failure();
+        else {
         this.spotify.getArtistRelatedArtists(res.artists.items[0].id)
         .then((res, err) => {
             if(err) console.error(err);
@@ -207,6 +217,7 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                             this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                             .then((res, err) => {
                                 if(err) console.error(err);
+                                else if(index + 1 === allTracks.length) callback();
                             })
                             .catch(e => {
                                 console.log('Error creating playlist');
@@ -258,14 +269,23 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                     });
                     
                     _payload.forEach(relatedRelatedArtist => {
+
+                        // Try this shit
+                        let chill = (relatedRelatedArtist) => {
                         this.spotify.getArtistTopTracks(relatedRelatedArtist, 'SE')
                         .then((res, err) => {
-                            if(err) --playlistLength;
+                            if(err) {
+                                console.log('Triggered err, ', err);
+                                setTimeout(() => chill(relatedRelatedArtist), 5000);
+                                console.log('Retrying in 5...')
+                            }
                             else {
                                 //console.log('alpha: ', relatedRelatedArtist);
                                 //let track = res.tracks[0].uri;
+                                
                                 let track = cousinFilter(res.tracks, res.tracks[0].artists[0].name);
-                                !track && ( track = res.tracks[0] );
+                                !track && ( track = res.tracks[0].uri );
+                                console.log('Track inside apicalls is: ', track);
                                 //console.log('beta: ', track);
                                 if(allTracks.includes(track)) {
                                     --playlistLength;
@@ -274,16 +294,29 @@ api.cousinAlgorithm = (artist, user_id, playlist_id) => {
                                 }
                             }
                         })
-                        .catch(_ => --playlistLength);
+                        .catch(e => {
+                            if(e) {
+                                console.log(e);
+                                //console.log('Catch found, ', e);
+                                if(e.status === 429) setTimeout(() => chill(relatedRelatedArtist), 5000);
+                                else --playlistLength;
+                                //console.log('Retrying in 5...')
+                            }
+                        });
+                        }
+                        chill(relatedRelatedArtist);
+
                     });
+                
                 }});
                 
             });
         })
+    }
     })  
 }
 
-// Weekly algopithm
+// Weekly algorithm
 // User top artists > Related > Top tracks(1)
 api.weeklyAlgorithm = (user_id, playlist_id) => {
     playlist_id = playlist_id.split(':');
