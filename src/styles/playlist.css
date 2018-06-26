@@ -102,14 +102,31 @@ input[type="submit"].inactive::before {
     transform: translateY(calc(100% + 60px));
 }
 
-.svg__spotify {
-    height: 250px;
+.svg__area {
     position: absolute;
     top: calc(50% + 100px);
     left: 50%;
-    transform-origin: center;
     z-index: -1;
     transform: translate(-50%, -50%);
+}
+
+.status-text {
+    color: var(--spotify-green);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 100%;
+    font-size: 26px;
+    transform: translate(-50%, calc( 100% + 5px ));
+    animation: fade-in .4s forwards 1;
+}
+
+@keyframes fade-in {0%{opacity:0}100%{opacity:1}}
+
+.svg__spotify {
+    height: 250px;
+    z-index: -1;
 }
 
 .svg__spotify > g > path:first-child {fill: #333;}

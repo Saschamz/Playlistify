@@ -73,8 +73,13 @@ api.capital_letter = (str) => {
     return str.join(" ");
 }
 
-api.createPlaylist = (user_id, name) => {
-    name = 'Playlistify: ' + api.capital_letter(name);
+api.createPlaylist = (user_id, artists) => {
+    let name = 'Playlistify: ';
+    for(let x = 0, i = artists.length; x < i; x++) {
+        let artist = api.capital_letter(artists[x]);
+        x < (i - 1) && ( name += ' ' + artist + ',' );
+        x === (i - 1) && ( name += ' ' + artist );
+    }
     return this.spotify.createPlaylist(user_id, {name, description: this.descriptionString});
 };
 
@@ -206,18 +211,21 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                     clearInterval(update);
 
                     allTracks.forEach((_, index) => {
-                        if(index !== 0 && index % 100 === 0) {
+                        if(index !== 0 && index % 100 === 0 && index !== allTracks.length - 1) {
                             let payload = allTracks.slice(index - 100, index);
                             this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                             .then((res, err) => {
                                 if(err) console.error(err);
+                                console.log('Sent payload at: ', index, '/', allTracks.length - 1)
                             })
-                        } else if(index + 1 === allTracks.length) {
-                            let payload = allTracks.slice(Math.floor(index / 100) * 100, index + 1);
+                        } else if(index === allTracks.length - 1) {
+                            console.log('MAXLENGTH=', index, '/', allTracks.length - 1);
+                            let payload = allTracks.slice(Math.floor(index / 100) * 100, allTracks.length);
                             this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                             .then((res, err) => {
                                 if(err) console.error(err);
-                                else if(index + 1 === allTracks.length) callback();
+                                console.log('Sent payload at max length')
+                                callback();
                             })
                             .catch(e => {
                                 console.log('Error creating playlist');
@@ -285,11 +293,11 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                                 
                                 let track = cousinFilter(res.tracks, res.tracks[0].artists[0].name);
                                 !track && ( track = res.tracks[0].uri );
-                                console.log('Track inside apicalls is: ', track);
+                                //console.log('Track inside apicalls is: ', track);
                                 //console.log('beta: ', track);
                                 if(allTracks.includes(track)) {
                                     --playlistLength;
-                                } else {
+                                } else if (!!track){
                                     allTracks.push(track);
                                 }
                             }
@@ -298,7 +306,11 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                             if(e) {
                                 console.log(e);
                                 //console.log('Catch found, ', e);
-                                if(e.status === 429) setTimeout(() => chill(relatedRelatedArtist), 5000);
+                                if(e.status === 429) {
+                                    setTimeout(() => chill(relatedRelatedArtist), 1000);
+                                    let status = document.querySelector('.status-text');
+                                    status && ( status.innerHTML = 'Waiting for spotify...');
+                                }
                                 else --playlistLength;
                                 //console.log('Retrying in 5...')
                             }

@@ -25,6 +25,7 @@ export default class PlayListGenerator extends Component {
                 playlistReady: this.state.playlistReady, playlistUri: this.state.playlistUri, algorithm: this.state.algorithm});
         });
         console.log('nowplaying', this.props.nowPlaying);
+        this.showError = false;
     }
     
     componentDidUpdate() {
@@ -41,20 +42,39 @@ export default class PlayListGenerator extends Component {
         }
     }
 
-    onSuccess(uri) {
-        console.log('Triggered onSucess');
-        this.props.updatePlaying(uri);
-        this.setState({
-            userInformation: this.state.userInformation,
-            playlistLoading: true,
-            playlistReady: true,
-            playlistUri: uri,
-            algorithm: this.state.algorithm
-        });
+    initSearchIndex() {
+        this.searchIndex = 0;
+    }
+
+    onSuccess(uri, lastIndex) {
+        console.log('triggered onsuccess');
+        ++this.searchIndex;
+        console.log(this.searchIndex, '/', lastIndex);
+        if(this.searchIndex >= lastIndex / 3 && this.searchIndex < lastIndex / 2) {
+            console.log('33% Completed');
+        } else if(this.searchIndex >= lastIndex / 2 && this.searchIndex !== lastIndex) {
+            console.log('66% Completed');
+        } else if(this.searchIndex === lastIndex ){
+            console.log('100% Completed');
+            this.props.updatePlaying(uri);
+            let status = document.querySelector('.status-text');
+            status && ( status.innerHTML = 'Complete!');
+            this.showError = false;
+            this.setState({
+                userInformation: this.state.userInformation,
+                playlistLoading: true,
+                playlistReady: true,
+                playlistUri: uri,
+                algorithm: this.state.algorithm
+            });
+        }
     }
 
     onFailure() {
         console.log('Triggered onFailure')
+        let status = document.querySelector('.status-text');
+        status && ( status.innerHTML = 'Could not find artist');
+        this.showError = true;
         let stripes = document.querySelector('.svg__spotify--stripes');
         stripes.classList.remove('svg__spotify--stripes--loading');
         stripes.classList.add('svg__spotify--stripes--error');
@@ -83,34 +103,39 @@ export default class PlayListGenerator extends Component {
         //document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
         // Get the input value
         let input = document.querySelector('input[type=text]').value;
+        let artists = input.split(',');
+        artists.forEach((_, i) => {
+            artists[i] = artists[i].trim();
+            artists[i] = artists[i][0].toUpperCase() + artists[i].substr(1);
+        });
 
         // Create the playlist
-        api.createPlaylist(this.state.userInformation.id, input)
+        api.createPlaylist(this.state.userInformation.id, artists)
         .then((res, err) => {
             if(err) console.log(err);
             else {
                 // Fill the playlist
-                let artists = input.split(',');
+                this.initSearchIndex();
                 console.log('Searching for ', artists);
                 console.log('Playlist ID should be sent as: ', res.uri);
                 //trim foreach
                 switch(this.state.algorithm) {
                     case 'sibling':
-                    artists.forEach(artist => api.siblingAlgorithm(
+                    artists.forEach((artist, index) => api.siblingAlgorithm(
                         artist, 
                         this.props.user.id, 
                         res.uri, 
-                        () => this.onSuccess(res.uri),
+                        () => this.onSuccess(res.uri, artists.length),
                         () => this.onFailure()
                     ));
                     break;
 
                     case 'cousin':
-                    artists.forEach(artist => api.cousinAlgorithm(
+                    artists.forEach((artist, index) => api.cousinAlgorithm(
                         artist, 
                         this.props.user.id, 
                         res.uri, 
-                        () => this.onSuccess(res.uri),
+                        () => this.onSuccess(res.uri, artists.length),
                         () => this.onFailure()
 
                     ));
@@ -181,7 +206,12 @@ export default class PlayListGenerator extends Component {
                     </form>
                 {this.state.playlistReady && this.renderPlayList()}
                 </div>
-                {svg}
+                    <div className="svg__area">
+                        {svg}
+                        {/* {( this.state.playlistLoading || this.showError ) && (
+                            <p className="status-text">Creating playlist...</p>
+                        )} */}
+                    </div>
                 <footer>Created by Sascha Ringström | <a href="mailto:sascharingstrom@gmail.com">sascharingstrom@gmail.com</a> </footer>
             </div>
         );
