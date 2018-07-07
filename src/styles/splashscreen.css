@@ -41,6 +41,12 @@
 * Statistics
 */
 
+.stats__container {
+    background: rgba(0,0,0,.5);
+    border-bottom: 1px solid white;
+    padding: 30px 0;
+}
+
 .playlist__name {
     width: 80%;
     margin: 0 auto;
@@ -50,26 +56,25 @@
     text-transform: uppercase;
     font-size: 24px;
     font-weight: 600;
-    margin-top: 40px;
 }
 
 .statistics {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    width: 500px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     margin: 0 auto;
     text-align: center;
 }
 
 .statistics__stat {
-
+    padding: 0 25px;
 }
 
 .statistics__stat__header {
     color: var(--spotify-green);
-    font-size: 60px;
+    font-size: 46px;
     font-weight: 600;
-    text-decoration: underline;
 }
 
 .statistics__stat__tooltip {
@@ -81,25 +86,15 @@
 
 /* Grid Borders */
 :root {
-    --border-width: 0px;
-    --border-color: hsl(0,0%,80%);
-}
-.statistics__stat:first-child {
-    border-bottom: solid var(--border-width) var(--border-color);
-    border-right: solid var(--border-width) var(--border-color);
-}
-.statistics__stat:nth-child(2) {
-    border-bottom: solid var(--border-width) var(--border-color);
-}
-.statistics__stat:nth-child(3) {
-    border-right: solid var(--border-width) var(--border-color);
+    --border: 2px solid hsla(141,73%,60%,.3);
 }
 
+.statistics__stat {border-left: var(--border)}
+.statistics__stat:first-child {border: none}
 
 /*
 * Player
 */
-
 
 .player {
     position: relative;
@@ -194,12 +189,12 @@
 }
 
 .player__controller {
-    color: hsl(0, 0%, 60%);
+    color: hsla(0, 0%, 100%, .6);
     transition: .05s;
 }
 
 .player__controller:hover {
-    color: white;
+    color: hsla(0, 0%, 100%, 1);
 }
 
 .player__controllers button {
@@ -246,11 +241,16 @@
     background: hsla(141,73%,42%,.2) !important;
     opacity: 1;
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: scale(5) translate(-5%, -50%);
     color: var(--spotify-green);
     border: 2px solid var(--spotify-green) !important;
+    transition: all .2s, transform 1.1s;
+}
+
+.no-context:hover {
+    background: hsla(141,73%,42%,.4) !important;
 }
 
 .no-context:hover {
@@ -262,62 +262,6 @@
 * Media links
 */
 
-.playlist__footer {
-    height: 212px;
-}
-
-.media {
-    width: 100%;
-    display: grid;
-    border-top: 2px solid #333;
-    border-bottom: 2px solid #333;
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-.media__option {
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    padding: 42px 0;
-}
-
-.media__option--facebook {
-    background: #3b5998;
-}
-
-.media__option--twitter {
-    background: hsl(207,88%,59%);
-}
-
-.media__option--clipboard {
-    background: hsla(0,0%,10%,1);
-}
-
-.open-in-spotify {
-    width: 100%;
-    background: hsl(141, 73%, 38%);
-    cursor: pointer;
-    padding: 12px 0;
-    text-align: center;
-    transition: .1s;
-}
-
-.open-in-spotify:hover {
-    background: var(--spotify-green);
-}
-
-.open-in-spotify:active {
-    background: hsl(141, 73%, 35%);
-}
-
-.open-in-spotify h3 {
-    font-weight: 300;
-}
-
-/* Thumbnails */
 .media__links {
     display: flex;
     justify-content: center;
@@ -326,17 +270,68 @@
 }
 
 .media-link {
+    border-bottom: 2px solid transparent;
     cursor: pointer;
     display: inline-block;
-    padding: 0 15px;
+    padding: 0 15px 5px 15px;
     font-size: 30px;
-    transition: .05s;
 }
 
 .media-link:hover {
-    transform: scale(1.1);
+    border-bottom: 2px solid var(--spotify-green);
 }
 
 .media-link:active {
     transform: scale(0.95);
+}
+
+/*
+* Responsive media queries
+*/
+
+/* Tablet and small screens */
+@media(max-width: 1200px) {
+
+    .stats__container {
+        padding: 10px 0;
+    }
+
+    .statistics__stat {
+        border: none;
+        padding: 0 5px;
+    }
+
+    .statistics__stat__header {
+        font-size: 24px;
+    }
+
+    .playlist__name {
+        font-size: 22px;
+    }
+
+    .media__links {
+        margin: 5px;
+    }
+
+    .media-link {
+        font-size: 24px;
+        padding: 0 10px;
+    }
+
+    .no-context {transform: scale(3) translate(-20%, -80%)}
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .player__now-playing__container {
+        margin-top: 20px !important;
+    }
+
+    .player__now-playing__container > p {font-size: 10px}
+    .player__now-playing__title h1 {font-size: 18px}
+    .player__now-playing__title h4 {font-size: 16px}
+    .player__cover-art {height: 150px; width: 150px; margin: 10px auto;}
+
+    .player__controllers {margin-top: 15px}
 }
