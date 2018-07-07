@@ -34,9 +34,11 @@ export default class FullView extends Component {
         const algorithms = document.querySelector('.algorithm-choices');
         const search = document.querySelector('.input-field');
         const expand = document.querySelector('.expand-button');
-        const playlist = document.querySelector('.playlist');
+        const playlist = document.querySelector('.splash-screen');
+        const nowPlayingContainer = document.querySelector('.player__now-playing__container');
         algorithms.style.height = '0px';
         playlist && ( setTimeout(() =>playlist.style.transform = 'translateY(calc(100% + 60px))', this.transition * 2) );
+        !!nowPlayingContainer && ( nowPlayingContainer.style.marginTop = '120px' );
         setTimeout(() => search.style.transform = 'translateY(-100%)', this.transition);
         setTimeout(() => expand.style.transform = 'translateY(0%)', this.transition * 2);
         this.setState({playing: this.state.playing, user: this.state.user, expanded: true});
@@ -46,11 +48,13 @@ export default class FullView extends Component {
         const algorithms = document.querySelector('.algorithm-choices');
         const search = document.querySelector('.input-field');
         const expand = document.querySelector('.expand-button');
-        const playlist = document.querySelector('.playlist');
+        const playlist = document.querySelector('.splash-screen');
+        const nowPlayingContainer = document.querySelector('.player__now-playing__container');
         expand.style.transform = 'translateY(-100%)';
         setTimeout(() => search.style.transform = 'translateY(0%)', this.transition);
         setTimeout(() => algorithms.style.height = '92px', this.transition * 2);
         playlist.style.transform = 'translateY(100%)';
+        !!nowPlayingContainer && ( nowPlayingContainer.style.marginTop = '40px' );
         //272px
     }
 

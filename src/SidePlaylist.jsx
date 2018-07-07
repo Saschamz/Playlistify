@@ -41,6 +41,7 @@ class SidePlaylist extends Component {
         document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
         const uri = e.target.attributes[1].value;
         this.props.updatePlaying(uri);
+        console.log('updating props with uri: ', uri);
     }
 
     handleWeekly(e) {

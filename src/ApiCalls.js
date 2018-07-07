@@ -94,11 +94,7 @@ api.getPlaylist = (userId, playlistId) => {
 }
 
 
-/*
-* WIP WIP WIP
-* Below are endpoints for the player
-* WIP WIP WIP
-*/
+/* Endpoints for the player */
 
 api.getPlayBack = () => {
     return this.spotify.getMyCurrentPlaybackState();
@@ -130,6 +126,11 @@ api.volume = (volume_percent) => {
 // state: boolean
 api.shuffle = (state) => {
     return this.spotify.setShuffle(state, {});
+}
+
+// used for fetching cover art
+api.getTrack = (trackId) => {
+    return this.spotify.getTrack(trackId);
 }
 
 
@@ -314,7 +315,7 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                                 console.log(e);
                                 //console.log('Catch found, ', e);
                                 if(e.status === 429) {
-                                    setTimeout(() => chill(relatedRelatedArtist), 1000);
+                                    setTimeout(() => chill(relatedRelatedArtist), 5000);
                                     let status = document.querySelector('.status-text');
                                     status && ( status.innerHTML = 'Waiting for spotify...');
                                 }

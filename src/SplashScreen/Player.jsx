@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { api } from '../ApiCalls';
-import $ from 'jquery';
+import FontAwesome from 'react-fontawesome';
 
 export default class Player extends Component {
 
@@ -20,17 +20,23 @@ export default class Player extends Component {
     componentDidMount() {
         api.init(this.props.token);
         this.shuffle();
+        this.updateComponent();
+        this.currentUri = this.props.uri;
+    }
+
+    updateComponent() {
         api.getPlayBack()
         .then((res, err) => {
             if(err) console.log(err);
 
             let context = this.props.uri === res.context.uri;
 
+            this.coverArt = res.item.album.images[1].url; // 0: 640x640, 1: 300x300, 2: 64x64
+
             let artists = '';
             res.item.artists.forEach(artist => artists += artist.name + ', ');
             artists = artists.trim();
             if(artists[artists.length - 1] === ',') artists = artists.substr(0, artists.length - 1);
-
             this.setState({
                 playing: res.is_playing,
                 playingSong: res.item.name,
@@ -38,12 +44,13 @@ export default class Player extends Component {
                 shuffle: res.shuffle_state,
                 context
             });
-            console.log('player res: ', res);
         });
+        this.currentUri = this.props.uri;
     }
 
     componentDidUpdate() {
-        this.state.context && setTimeout(() => {
+        if(this.currentUri !== this.props.uri) this.updateComponent();
+        else if(document.querySelector('.playing__now-playing-title')) this.state.context && setTimeout(() => {
             if(document.querySelector('.player__now-playing__title').classList.contains('fade-in-bounce')) {
                 document.querySelector('.player__now-playing__title').classList.remove('fade-in-bounce');
             }
@@ -94,6 +101,8 @@ export default class Player extends Component {
                 artists = artists.trim();
                 if(artists[artists.length - 1] === ',') artists = artists.substr(0, artists.length - 1);
     
+                this.coverArt = res.item.album.images[1].url; // 0: 640x640, 1: 300x300, 2: 64x64
+
                 this.setState({
                     playing: this.state.playing,
                     playingSong: res.item.name,
@@ -167,7 +176,7 @@ export default class Player extends Component {
                         <button
                             className="player__controller fade-in-bounce" 
                             onClick={this.previous.bind(this)}>
-                            &lt;&lt;
+                            <FontAwesome name='backward'/>
                         </button>
                     )
                 }
@@ -176,13 +185,13 @@ export default class Player extends Component {
                     <button 
                     onClick={this.pause.bind(this)}
                     className={className + ' pause-button'}>
-                        ||
+                        <FontAwesome name='pause'/>
                     </button>
                     ) : (
                     <button 
                     onClick={this.play.bind(this)}
                     className={className + ' play-button'}>
-                        &gt;
+                        <FontAwesome name='play'/>
                     </button>
                 )}
 
@@ -191,7 +200,7 @@ export default class Player extends Component {
                         <button
                             className="player__controller fade-in-bounce"  
                             onClick={this.next.bind(this)}>
-                            &gt;&gt;
+                            <FontAwesome name='forward'/>
                         </button> 
                     )
                 }
@@ -216,6 +225,7 @@ export default class Player extends Component {
                     {
                         this.state.context && (
                             <div className="player__now-playing__container">
+                            <div className="player__cover-art fade-in-bounce" style={{background: `url('${this.coverArt || null}')`}}></div>
                                 <p className="fade-in-bounce">Now Playing</p>
                                 <div className="player__now-playing__title fade-in-bounce">
                                     <h1>{this.state.playingSong}</h1>
