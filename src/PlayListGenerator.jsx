@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { svg } from './Svg';
 import { api } from './ApiCalls';
+import SplashScreen from './SplashScreen/SplashScreen';
 
 export default class PlayListGenerator extends Component {
 
@@ -163,9 +164,13 @@ export default class PlayListGenerator extends Component {
     }
 
     renderPlayList() {
-        return (
+        /*return (
             <iframe title="Playlist" src={`https://open.spotify.com/embed?uri=${this.props.nowPlaying}`} className="playlist" frameBorder="0" allow="encrypted-media"></iframe>
-        );
+        );*/
+        return <SplashScreen 
+        token={this.props.token}
+        playlistId={this.props.nowPlaying} 
+        userId={this.props.user.id} />
     }
 
     changeAlgorithm(e) {

@@ -41,10 +41,10 @@ class App extends Component {
       var CLIENT_ID = 'e0ec0666abbe4d258cafddd3c622b045';
       
       // Deployment
-      var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
+      //var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
       
       // Development
-      //var REDIRECT_URI = 'http://localhost:3000/';
+      var REDIRECT_URI = 'http://localhost:3000/';
 
       function getLoginURL(scopes) {
           return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
@@ -54,7 +54,7 @@ class App extends Component {
       }
       
       var url = getLoginURL([
-          'user-read-private user-top-read user-read-email user-read-playback-state playlist-modify-public'
+          'streaming app-remote-control user-read-private user-top-read user-read-email user-read-playback-state playlist-modify-public'
       ]);
       
 

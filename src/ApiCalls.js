@@ -87,6 +87,12 @@ api.getPlaylists = () => {
     return this.spotify.getUserPlaylists();
 }
 
+api.getPlaylist = (userId, playlistId) => {
+    playlistId = playlistId.split(':');
+    playlistId = playlistId[playlistId.length - 1];
+    return this.spotify.getPlaylist(userId, playlistId);
+}
+
 
 /*
 * WIP WIP WIP
@@ -95,24 +101,25 @@ api.getPlaylists = () => {
 */
 
 api.getPlayBack = () => {
-    return this.spotify.getMyCurrentPlayBackState();
+    return this.spotify.getMyCurrentPlaybackState();
 }
 
 // Send a context_uri if playlist is not playing
 api.play = (context_uri = false) => {
-    context_uri ? this.spotify.play({context_uri}) : this.spotify.play();
+    console.log('CONTEXT_URI IS', {context_uri});
+    return context_uri ? this.spotify.play({context_uri}) : this.spotify.play({});
 }
 
 api.pause = () => {
-    return this.spotify.pause();
+    return this.spotify.pause({});
 }
 
-api.next = () => {
-    return this.spotify.skipToNext();
+api.nextTrack = () => {
+    return this.spotify.skipToNext({});
 }
 
-api.previous = () => {
-    return this.spotify.skipToPrevious();
+api.previousTrack = () => {
+    return this.spotify.skipToPrevious({});
 }
 
 // volume_percent: 0-100
@@ -122,7 +129,7 @@ api.volume = (volume_percent) => {
 
 // state: boolean
 api.shuffle = (state) => {
-    return this.spotify.setShuffle(state);
+    return this.spotify.setShuffle(state, {});
 }
 
 
