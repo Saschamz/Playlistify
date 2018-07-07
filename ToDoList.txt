@@ -14,6 +14,7 @@ All songs added to playlist should then be within a set range of this.
 = General =
 - A lot of code cleanup/small improvements.
 - Making components more responsive as well as increasing scaleability.
+- Add refresh token functionality for spotify AUTH.
 
 = Design =
 - Get the slide animation that is currently hidden working for track name when switching song.
