@@ -25,7 +25,6 @@ export default class PlayListGenerator extends Component {
             else this.setState({userInformation: res, playlistLoading: this.state.playlistLoading, 
                 playlistReady: this.state.playlistReady, playlistUri: this.state.playlistUri, algorithm: this.state.algorithm});
         });
-        console.log('nowplaying', this.props.nowPlaying);
         this.showError = false;
     }
     
@@ -48,9 +47,7 @@ export default class PlayListGenerator extends Component {
     }
 
     onSuccess(uri, lastIndex) {
-        console.log('triggered onsuccess');
         ++this.searchIndex;
-        console.log(this.searchIndex, '/', lastIndex);
         if(this.searchIndex >= lastIndex / 3 && this.searchIndex < lastIndex / 2) {
             console.log('33% Completed');
         } else if(this.searchIndex >= lastIndex / 2 && this.searchIndex !== lastIndex) {
@@ -72,7 +69,6 @@ export default class PlayListGenerator extends Component {
     }
 
     onFailure() {
-        console.log('Triggered onFailure')
         let status = document.querySelector('.status-text');
         status && ( status.innerHTML = 'Could not find artist');
         this.showError = true;
@@ -164,9 +160,6 @@ export default class PlayListGenerator extends Component {
     }
 
     renderPlayList() {
-        /*return (
-            <iframe title="Playlist" src={`https://open.spotify.com/embed?uri=${this.props.nowPlaying}`} className="playlist" frameBorder="0" allow="encrypted-media"></iframe>
-        );*/
         return <SplashScreen 
         token={this.props.token}
         playlistId={this.props.nowPlaying} 
@@ -198,13 +191,13 @@ export default class PlayListGenerator extends Component {
                     <form className="input-field__form" onSubmit={this.requestPlaylist.bind(this)}>
                         <input className="input-field__form__input" type="text" placeholder="Artist1, Artist2, Artist3 etc..." onChange={this.handleChange.bind(this)}/>
                         <div className="algorithm-choices">
-                            <div className="algorithm-choice algorithm-current" id="sibling" onClick={this.changeAlgorithm.bind(this)}>
-                                <h3>Sibling Algorithm</h3>
-                                <p>Creates a reliable playlist with reoccuring artists.</p>
+                            <div className="algorithm-choice algorithm-current" id="cousin" onClick={this.changeAlgorithm.bind(this)}>
+                                <h3>Mixed Algorithm</h3>
+                                <p>Creates a playlist with zero reoccuring artists.</p>
                             </div>
-                            <div className="algorithm-choice" id="cousin" onClick={this.changeAlgorithm.bind(this)}>
-                                <h3>Cousin Algorithm</h3>
-                                <p>Creates a less reliable playlist with zero reoccuring artists.</p>
+                            <div className="algorithm-choice" id="sibling" onClick={this.changeAlgorithm.bind(this)}>
+                                <h3>Common Algorithm</h3>
+                                <p>Creates a more reliable playlist with reoccuring artists.</p>
                             </div>
                         </div>
                         <input className="input-field__form__submit inactive" type="submit" value="Create Playlist"/>

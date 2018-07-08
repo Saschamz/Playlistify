@@ -1,3 +1,6 @@
+
+/* Mobile */
+
 @media (max-width: 768px) {
     .layout__grid {
       grid-template-columns: 0fr 1fr !important;
@@ -47,4 +50,48 @@
       width: 100%;
       text-align: center;
     }
+
+  .player__now-playing__container {
+      margin-top: 20px !important;
   }
+
+  .player__now-playing__container > p {font-size: 10px}
+  .player__now-playing__title h1 {font-size: 18px}
+  .player__now-playing__title h4 {font-size: 16px}
+  .player__cover-art {height: 150px; width: 150px; margin: 10px auto;}
+  .player__controllers {margin-top: 15px}
+
+  }
+
+  /* Tablet */
+
+  @media(max-width: 1200px) {
+
+    .stats__container {
+        padding: 10px 0;
+    }
+
+    .statistics__stat {
+        border: none;
+        padding: 0 5px;
+    }
+
+    .statistics__stat__header {
+        font-size: 24px;
+    }
+
+    .playlist__name {
+        font-size: 22px;
+    }
+
+    .media__links {
+        margin: 5px;
+    }
+
+    .media-link {
+        font-size: 24px;
+        padding: 0 10px;
+    }
+
+    .no-context {transform: scale(3) translate(-20%, -80%)}
+}

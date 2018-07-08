@@ -1,10 +1,8 @@
 import { searchAlgorithm, halfTopTracks, cousinFilter } from './SearchAlgorithm';
-//const Spotify = require('spotify-web-api-js');
 const SpotifyWebApi = require('spotify-web-api-js');
-//const s = new Spotify();
 
-const limit = 5; // This affects how many related artists are retrieved per search
-// One artist results in 5*10 = 50 songs per playlist
+const limit = 5; // This affects how many related artists are retrieved per search for sibling algorithm
+// One artist results in 5*20 = 100 songs per playlist
 
 export const api = {};
 
@@ -24,11 +22,10 @@ api.addToPlaylist = (artist) => {
             err && console.error(err);
             
             const relatedArtists = searchAlgorithm(res.artists, limit);
-            // Call the algorithm and recieve an array of <=20 artists
             
             const returnData = [];
             
-            relatedArtists.forEach((artist, index) => {
+            relatedArtists.forEach((_, index) => {
                 
                 this.spotify.getArtistTopTracks(relatedArtists[index].id, 'SE', (err, res) => {
                     if(err) console.log(err);
@@ -43,12 +40,9 @@ api.addToPlaylist = (artist) => {
                     clearInterval(_interval);
                     return returnData;
                 }
-            }, 10);
-            
-        })
-        
-        
-    })
+            }, 10);  
+        }) 
+    });
 }
 
 api.getRelated = artist => {
@@ -207,7 +201,6 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
         .then((res, err) => {
             if(err) console.error(err);
             const related = res.artists;
-            console.log('Found related: ', related.length);
 
             let allTracks = [];
             let playlistLength = related.length * 20;
@@ -286,7 +279,6 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                     
                     _payload.forEach(relatedRelatedArtist => {
 
-                        // Try this shit
                         let chill = (relatedRelatedArtist) => {
                         this.spotify.getArtistTopTracks(relatedRelatedArtist, 'SE')
                         .then((res, err) => {
@@ -296,13 +288,10 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                                 console.log('Retrying in 5...')
                             }
                             else {
-                                //console.log('alpha: ', relatedRelatedArtist);
-                                //let track = res.tracks[0].uri;
+
                                 
                                 let track = cousinFilter(res.tracks, res.tracks[0].artists[0].name);
                                 !track && ( track = res.tracks[0].uri );
-                                //console.log('Track inside apicalls is: ', track);
-                                //console.log('beta: ', track);
                                 if(allTracks.includes(track)) {
                                     --playlistLength;
                                 } else if (!!track){
@@ -313,14 +302,12 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
                         .catch(e => {
                             if(e) {
                                 console.log(e);
-                                //console.log('Catch found, ', e);
                                 if(e.status === 429) {
                                     setTimeout(() => chill(relatedRelatedArtist), 5000);
                                     let status = document.querySelector('.status-text');
                                     status && ( status.innerHTML = 'Waiting for spotify...');
                                 }
                                 else --playlistLength;
-                                //console.log('Retrying in 5...')
                             }
                         });
                         }
