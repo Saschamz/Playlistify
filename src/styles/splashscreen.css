@@ -95,6 +95,7 @@
     text-align: left;
     max-height: 50vh;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 123;
     padding: 10px;
     position: absolute;
@@ -107,6 +108,7 @@
     margin: 2px 0;
     white-space: nowrap;
     letter-spacing: 1px;
+    list-style: none;
 }
 
 /* Grid Borders */
@@ -137,9 +139,42 @@
     height: 250px;
     width: 250px;
     background-size: cover !important;
+    position: relative;
     margin: 20px auto;
     border: 1px solid white;
 }
+
+/* SLIDER TESTING */
+
+.timestamp {
+    position: absolute;
+    color: hsla(0, 0%, 100%, .6);
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 100%);
+    width: 100%;
+
+}
+
+.timestamp input {
+    width: 100%;
+    -webkit-appearance: none;  /* Override default CSS styles */
+    height: 5px;
+    border-radius: 5px;
+    background: rgba(0,0,0,.6);
+}
+
+.timestamp input::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    border-radius: 50%;
+    background: var(--spotify-green);
+    cursor: pointer; /* Cursor on hover */
+}
+
+/* */
 
 .player__now-playing {
     text-align: center;
