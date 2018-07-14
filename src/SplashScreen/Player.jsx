@@ -13,15 +13,21 @@ export default class Player extends Component {
             playingSong: null,
             playingArtist: null,
             shuffle: false,
-            context: false
+            context: false,
+            timeStamp: {
+                current: 0,
+                total: 0
+            },
         }
     }
 
     componentDidMount() {
+        console.log('Player component recieved props: ', this.props);
         api.init(this.props.token);
         this.shuffle();
         this.updateComponent();
         this.currentUri = this.props.uri;
+        this.updatesQueued = 0;
     }
 
     updateComponent() {
@@ -42,7 +48,8 @@ export default class Player extends Component {
                 playingSong: res.item.name,
                 playingArtist: artists,
                 shuffle: res.shuffle_state,
-                context
+                context,
+                timeStamp: this.state.timeStamp
             });
         });
         this.currentUri = this.props.uri;
@@ -67,7 +74,8 @@ export default class Player extends Component {
                 playingSong: this.state.playingSong,
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
-                context: true
+                context: true,
+                timeStamp: this.state.timeStamp
             });
             this.updateInfo(false);
         });
@@ -80,7 +88,8 @@ export default class Player extends Component {
             playingSong: this.state.playingSong,
             playingArtist: this.state.playingArtist,
             shuffle: this.state.shuffle,
-            context: this.state.context
+            context: this.state.context,
+            timeStamp: this.state.timeStamp
         });
 
         api.pause()
@@ -95,6 +104,36 @@ export default class Player extends Component {
             api.getPlayBack()
             .then((res, err) => {
                 if(err) console.log(err);
+
+
+            // Temporary solution for auto updating, fix better when implementing time-track
+            // Save time in state and render that somewhere without implementing time-track
+            let currTime = res.progress_ms;
+            const totalTime = res.item.duration_ms;
+            if(this.updatesQueued < 1) {
+                ++this.updatesQueued;
+                this.update = setInterval(() => {
+                    if(currTime >= totalTime) {
+                        clearInterval(this.update);
+                        --this.updatesQueued;
+                        this.updateComponent();
+                    } else if(this.state.playing){
+                        currTime += 1000;
+                        console.log(currTime);
+                        this.setState({
+                            playing: this.state.playing,
+                            playingSong: this.state.playingSong,
+                            playingArtist: this.state.playingArtist,
+                            shuffle: this.state.shuffle,
+                            context: this.state.context,
+                            timeStamp: {
+                                current: Math.round(currTime / 1000),
+                                total: Math.round(totalTime / 1000)
+                            }
+                        });
+                    }
+                }, 1000);
+            }
 
                 let artists = '';
                 res.item.artists.forEach(artist => artists += artist.name + ', ');
@@ -121,13 +160,16 @@ export default class Player extends Component {
         api.previousTrack()
         .then((_, err) => {
             if(err) console.log(err);
+            this.updatesQueued = 0;
+            clearInterval(this.update);
 
             this.setState({
                 playing: true,
                 playingSong: this.state.playingSong,
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
-                context: this.state.context
+                context: this.state.context,
+                timeStamp: this.state.timeStamp
             });
             this.updateInfo();
         });
@@ -138,13 +180,16 @@ export default class Player extends Component {
         api.nextTrack()
         .then((res, err) => {
             if(err) console.log(err);
+            this.updatesQueued = 0;
+            clearInterval(this.update);
             
             this.setState({
                 playing: true,
                 playingSong: this.state.playingSong,
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
-                context: this.state.context
+                context: this.state.context,
+                timeStamp: this.state.timeStamp
             });
             this.updateInfo();
         });
@@ -157,7 +202,8 @@ export default class Player extends Component {
             playingSong: this.state.playingSong,
             playingArtist: this.state.playingArtist,
             shuffle: !this.state.shuffle,
-            context: this.state.context
+            context: this.state.context,
+            timeStamp: this.state.timeStamp
         });
 
         api.shuffle(true)
@@ -225,7 +271,11 @@ export default class Player extends Component {
                     {
                         this.state.context && (
                             <div className="player__now-playing__container">
-                            <div className="player__cover-art fade-in-bounce" style={{background: `url('${this.coverArt || null}')`}}></div>
+                            <div className="player__cover-art fade-in-bounce" style={{background: `url('${this.coverArt || null}')`}}>
+                                <span className="timestamp">
+                                    <input type="range" value={this.state.timeStamp.current} max={this.state.timeStamp.total}/>
+                                </span>
+                            </div>
                                 <p className="fade-in-bounce">Now Playing</p>
                                 <div className="player__now-playing__title fade-in-bounce">
                                     <h1>{this.state.playingSong}</h1>

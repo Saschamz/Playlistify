@@ -10,11 +10,12 @@ export default class Statistics extends Component {
 
     componentWillMount() {
         this.updateComponent();
-        console.log('PROPS= ', this.props);
+        console.log('PROPS FOR STATISTICS: ', this.props);
     }
 
     updateComponent() {
 
+        this.props.playlist.tracks.items = this.props.playlist.tracks.items.filter(i => i.track);
         const tracks = this.props.playlist.tracks.items;
         const releaseDates = new Set();
         const uniqueTracks = new Set();
@@ -31,7 +32,8 @@ export default class Statistics extends Component {
         this.currentPlaylistId = this.props.playlist.id;
 
         this.props.playlist.tracks.items.forEach(item => {
-            let release = item.track.album.release_date.substr(0,4);
+
+            let release = item.track.album && item.track.album.release_date && item.track.album.release_date.substr(0,4);
             let popularity = item.track.popularity;
             const trackName = item.track.name;
             let artistNames = [];
@@ -48,9 +50,11 @@ export default class Statistics extends Component {
             }
 
             uniqueTracks.add(item.track.name);
-            releaseDates.add(release);
-            release < oldestTrack && ( oldestTrack = release );
-            release > latestTrack && ( latestTrack = release );
+            if(release) {
+                releaseDates.add(release);
+                release < oldestTrack && ( oldestTrack = release );
+                release > latestTrack && ( latestTrack = release );
+            }
             this.popularityPerSong += item.track.popularity;
             this.duration += item.track.duration_ms;
 

@@ -63,6 +63,8 @@
 
   }
 
+  .cover {background-size: contain !important}
+
   /* Tablet */
 
   @media(max-width: 1200px) {
@@ -94,4 +96,11 @@
     }
 
     .no-context {transform: scale(3) translate(-20%, -80%)}
+}
+
+/* Mozilla specific fixes */
+@-moz-document url-prefix() {
+  .side-playlist__container {
+    overflow-y: hidden;
+  }
 }

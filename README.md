@@ -5,7 +5,7 @@ using various different algorithms with the purpose of discovering new artists &
 
 ## Want to help develop Playlistify?
 This is an open source project and all help is wanted.
-If you want to help develop then please check the ToDoList.txt and include which feature/fix you have added in your commit. 
+If you want to help develop then please check the ToDoList and include which feature/fix you have added in your commit. 
 Everyone comitting features will be credited here on GitHub.
 
 ## Have suggestions or feedback?

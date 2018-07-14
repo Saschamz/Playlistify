@@ -18,5 +18,17 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "description": "This projects runs solely on the client using React and Spotify's API. The application functions as a tool for Spotify users to quickly and easily create new playlists using various different algorithms with the purpose of discovering new artists & songs.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Saschamz/playlistify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Saschamz/playlistify/issues"
+  },
+  "homepage": "https://github.com/Saschamz/playlistify#readme"
 }
