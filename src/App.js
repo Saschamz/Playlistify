@@ -42,11 +42,9 @@ class App extends Component {
       
       // Deployment
       var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
-      //
       
       // Development
       //var REDIRECT_URI = 'http://localhost:3000/';
-      //
 
       function getLoginURL(scopes) {
           return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
