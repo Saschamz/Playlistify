@@ -13,7 +13,7 @@ export default class PlayListGenerator extends Component {
             playlistLoading: false,
             playlistReady: false,
             playlistUri: null,
-            algorithm: 'sibling'
+            algorithm: 'cousin'
         };
     }
 
