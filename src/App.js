@@ -15,16 +15,81 @@ class App extends Component {
     };
   }
 
-  componentDidUpdate(){
-    //
-    //
-    //
-    //
-    //
-    //
-    //
+  componentDidMount() {
+    function getHashParams() {
+      var hashParams = {};
+      var e, r = /([^&;=]+)=?([^&;]*)/g,
+          q = window.location.hash.substring(1);
+      while ( e = r.exec(q)) {
+         hashParams[e[1]] = decodeURIComponent(e[2]);
+      }
+      return hashParams;
+    }
+    const token = getHashParams().access_token;
+    token && this.setState({
+      loggedIn: true,
+      token
+    });
+    this.test()
   }
+
+  test() {
+    function login(callback) {
+      var CLIENT_ID = 'e0ec0666abbe4d258cafddd3c622b045';
+      
+      // Deployment
+      var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
+      
+      // Development
+      //var REDIRECT_URI = 'http://localhost:3000/';
+
+      function getLoginURL(scopes) {
+          return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
+            '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
+            '&scope=' + encodeURIComponent(scopes.join(' ')) +
+            '&response_type=token';
+      }
+      
+      var url = getLoginURL([
+          'streaming app-remote-control user-read-private user-top-read user-read-email user-read-playback-state playlist-modify-public'
+      ]);
+      
+
   
+      window.addEventListener("message", function(event) {
+          var hash = JSON.parse(event.data);
+          if (hash.type === 'access_token') {
+              callback(hash.access_token);
+          }
+      }, false);
+      
+      //var w = window.open(url, '_self', 'menubar=no,location=no,resizable=no,scrollbars=no,status=no');
+      window.location.href = url;
+      //CLIENT_ID = CLIENT_ID.split("").reverse().join("");
+  }
+
+  function getUserData(accessToken) {
+      return $.ajax({
+          url: 'https://api.spotify.com/v1/me',
+          headers: {
+             'Authorization': 'Bearer ' + accessToken
+          }
+      });
+  }
+
+  var loginButton = document.getElementById('btn-login');
+  
+  loginButton.addEventListener('click', function() {
+      login(function(accessToken) {
+          getUserData(accessToken)
+              .then(function(response) {
+                  loginButton.style.display = 'none';
+              });
+          });
+  });
+    
+  
+  }
 
   // User is not logged in, render link to login
   renderLogin() {
@@ -39,87 +104,6 @@ class App extends Component {
         </div>
       </div>
     );
-  }
-  componentDidMount() {
-    this._x_ = 'e0ec0666ab';
-    function getHashParams() {
-      var hashParams = {};
-      var e, r = /([^&;=]+)=?([^&;]*)/g,
-          q = window.location.hash.substring(1);
-      while ( e = r.exec(q)) {
-         hashParams[e[1]] = decodeURIComponent(e[2]);
-      }
-      return hashParams;
-    }
-    this._y_ = 'dd3c622b045';
-    const token = getHashParams().access_token;
-    token && this.setState({
-      loggedIn: true,
-      token
-    });
-    this._o_ = 'be4d258cafd';
-    this.test()
-  }
-
-  test() {
-    function login(callback) {
-      // Change this to env variable
-      var CLIENT_ID = 'dbbc0a0dboo0dla45lapdzzd0';
-      
-      // Deployment
-      var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
-      //
-
-      // Development
-      //var REDIRECT_URI = 'http://localhost:3000/';
-      //
-
-
-
-      window.addEventListener("message", function(event) {
-          var hash = JSON.parse(event.data);
-          if (hash.type === 'access_token') {
-              callback(hash.access_token);
-          }
-      }, false);
-      
-      window.location.href = url;
-  }
-
-  function getUserData(accessToken) {
-      return $.ajax({
-          url: 'https://api.spotify.com/v1/me',
-          headers: {
-             'Authorization': 'Bearer ' + accessToken
-          }
-      });
-  }
-
-  function getLoginURL(scopes) {
-    return 'https://accounts.spotify.com/authorize?client_id='+
-    this._x_+
-    this._o_+
-    this._y_+ '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
-      '&scope=' + encodeURIComponent(scopes.join(' ')) +
-      '&response_type=token';
-}
-
-var url = getLoginURL([
-    'streaming app-remote-control user-read-private user-top-read user-read-email user-read-playback-state playlist-modify-public'
-]);
-
-  var loginButton = document.getElementById('btn-login');
-  
-  loginButton.addEventListener('click', function() {
-      login(function(accessToken) {
-          getUserData(accessToken)
-              .then(function(response) {
-                  loginButton.style.display = 'none';
-              });
-          });
-  });
-    
-  
   }
 
   renderLoggedin() {
