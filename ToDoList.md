@@ -15,7 +15,6 @@ All songs added to playlist should then be within a set range of this.
 - A lot of code cleanup/small improvements.
 - Making components more responsive as well as improving scaleability.
 - Add refresh token functionality for spotify AUTH.
-- Some users can't seem to press play button because "playlist.uri was not found in Player.jsx".
 
 ## Design
 - Get the slide animation that is currently hidden working for track name when switching song.
