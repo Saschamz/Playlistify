@@ -14,6 +14,7 @@ export default class Player extends Component {
             playingArtist: null,
             shuffle: false,
             context: false,
+            isConnectedToDevice: true,
             timeStamp: {
                 current: 0,
                 total: 0
@@ -22,10 +23,20 @@ export default class Player extends Component {
     }
 
     componentDidMount() {
-        console.log('Player component recieved props: ', this.props);
         api.init(this.props.token);
-        this.shuffle();
-        this.updateComponent();
+
+        api.getPlayBack()
+        .then((res, err) => {
+            if(err || !res) {
+                this.setState({...this.state, isConnectedToDevice: false});
+            } else {
+                this.shuffle();
+                this.updateComponent();
+                this.setState({...this.state, isConnectedToDevice: true});
+            }
+        })
+        .catch(e => console.log(e))
+
         this.currentUri = this.props.uri;
         this.updatesQueued = 0;
     }
@@ -33,25 +44,29 @@ export default class Player extends Component {
     updateComponent() {
         api.getPlayBack()
         .then((res, err) => {
-            if(err) console.log(err);
+            if(err || !res) {
+                this.setState({...this.state, isConnectedToDevice: false});
+            } else {
+                let context = this.props.uri === res.context.uri;
 
-            let context = this.props.uri === res.context.uri;
-
-            this.coverArt = res.item.album.images[1].url; // 0: 640x640, 1: 300x300, 2: 64x64
-
-            let artists = '';
-            res.item.artists.forEach(artist => artists += artist.name + ', ');
-            artists = artists.trim();
-            if(artists[artists.length - 1] === ',') artists = artists.substr(0, artists.length - 1);
-            this.setState({
-                playing: res.is_playing,
-                playingSong: res.item.name,
-                playingArtist: artists,
-                shuffle: res.shuffle_state,
-                context,
-                timeStamp: this.state.timeStamp
-            });
-        });
+                this.coverArt = res.item.album.images[1].url; // 0: 640x640, 1: 300x300, 2: 64x64
+    
+                let artists = '';
+                res.item.artists.forEach(artist => artists += artist.name + ', ');
+                artists = artists.trim();
+                if(artists[artists.length - 1] === ',') artists = artists.substr(0, artists.length - 1);
+                this.setState({
+                    playing: res.is_playing,
+                    playingSong: res.item.name,
+                    playingArtist: artists,
+                    shuffle: res.shuffle_state,
+                    context,
+                    timeStamp: this.state.timeStamp,
+                    isConnectedToDevice: true
+                });
+            }
+        })
+        .catch(e => console.log(e));
         this.currentUri = this.props.uri;
     }
 
@@ -75,7 +90,8 @@ export default class Player extends Component {
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
                 context: true,
-                timeStamp: this.state.timeStamp
+                timeStamp: this.state.timeStamp,
+                isConnectedToDevice: this.state.isConnectedToDevice
             });
             this.updateInfo(false);
         });
@@ -89,7 +105,8 @@ export default class Player extends Component {
             playingArtist: this.state.playingArtist,
             shuffle: this.state.shuffle,
             context: this.state.context,
-            timeStamp: this.state.timeStamp
+            timeStamp: this.state.timeStamp,
+            isConnectedToDevice: this.state.isConnectedToDevice
         });
 
         api.pause()
@@ -104,6 +121,7 @@ export default class Player extends Component {
             api.getPlayBack()
             .then((res, err) => {
                 if(err) console.log(err);
+                console.log('RES', res);
 
 
             // Temporary solution for auto updating, fix better when implementing time-track
@@ -126,13 +144,14 @@ export default class Player extends Component {
                             playingArtist: this.state.playingArtist,
                             shuffle: this.state.shuffle,
                             context: this.state.context,
+                            isConnectedToDevice: this.state.isConnectedToDevice,
                             timeStamp: {
                                 current: Math.round(currTime / 1000),
                                 total: Math.round(totalTime / 1000)
                             }
                         });
                     }
-                }, 1000);
+                }, 1000)
             }
 
                 let artists = '';
@@ -147,11 +166,12 @@ export default class Player extends Component {
                     playingSong: res.item.name,
                     playingArtist: artists,
                     shuffle: res.shuffle_state,
-                    context: this.state.context
+                    context: this.state.context,
+                    isConnectedToDevice: this.state.isConnectedToDevice
                 });
 
                 slide && this.slideTitle();
-            });
+            })
         }, 200);
     }
 
@@ -169,7 +189,8 @@ export default class Player extends Component {
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
                 context: this.state.context,
-                timeStamp: this.state.timeStamp
+                timeStamp: this.state.timeStamp,
+                isConnectedToDevice: this.stateisConnectedToDevice
             });
             this.updateInfo();
         });
@@ -189,7 +210,8 @@ export default class Player extends Component {
                 playingArtist: this.state.playingArtist,
                 shuffle: this.state.shuffle,
                 context: this.state.context,
-                timeStamp: this.state.timeStamp
+                timeStamp: this.state.timeStamp,
+                isConnectedToDevice: this.state.isConnectedToDevice
             });
             this.updateInfo();
         });
@@ -203,7 +225,8 @@ export default class Player extends Component {
             playingArtist: this.state.playingArtist,
             shuffle: !this.state.shuffle,
             context: this.state.context,
-            timeStamp: this.state.timeStamp
+            timeStamp: this.state.timeStamp,
+            isConnectedToDevice: this.state.isConnectedToDevice
         });
 
         api.shuffle(true)
@@ -261,6 +284,10 @@ export default class Player extends Component {
         document.querySelector('.player__now-playing__title').classList.remove('slide');
         setTimeout(() => document.querySelector('.player__now-playing__title').classList.add('slide'), 20);
     }
+
+    renderErrorMsg(msg) {
+        return(<h1 className="error-msg">{msg}</h1>);
+    }
     
 
     render() {
@@ -285,7 +312,12 @@ export default class Player extends Component {
                         )
                     }
                     </div>
-                    {this.renderControllers()}
+                    {!this.props.premiumUser && this.renderErrorMsg('Premium account required to access browser player.')}
+                    {
+                        this.state.isConnectedToDevice &&
+                        this.props.premiumUser ? this.renderControllers() :
+                        this.renderErrorMsg('Open spotify app if you want to play directly from browser')
+                    }
                 </div>
             </div>
         );

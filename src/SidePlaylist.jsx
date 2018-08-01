@@ -6,7 +6,8 @@ class SidePlaylist extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            playlists: []
+            playlists: [],
+            weeklyAvailable: false
         };
     }
 
@@ -14,6 +15,14 @@ class SidePlaylist extends Component {
         api.init(this.props.token);
         this.updatePlaylist();
         console.log(this.props.nowPlaying);
+
+        //Check if user is eligable for weekly playlist
+        api.weeklyAvailable()
+        .then((res, err) => {
+            if(err || !res.items.length) console.log('User not eligable for weekly playlist.');
+            else this.setState({...this.state, weeklyAvailable: true});
+        })
+        .catch(e => console.log(e));
     }
     
     componentDidUpdate() {
@@ -32,7 +41,7 @@ class SidePlaylist extends Component {
             if(err) console.error(err);
             else {
                 let playlists = res.items;
-                this.setState({playlists});
+                this.setState({weeklyAvailable: this.state.weeklyAvailable, playlists});
             }
         });
     }
@@ -57,24 +66,22 @@ class SidePlaylist extends Component {
         document.querySelector('.svg__spotify--stripes').classList.add('svg__spotify--stripes--loading');
 
         // Create playlist
-        api.createPlaylist(this.props.user.id, `Week ${weekNumber}`)
+        api.createPlaylistExplicit(this.props.user.id, `Playlistify: Week ${weekNumber}`)
         .then((res, err) => {
             if(err) console.log(err);
             else {
-                api.weeklyAlgorithm(this.props.user.id, res.uri);
-                setTimeout(() => {
-                    this.props.updatePlaying(res.uri)
-                }, 2000);
+                api.weeklyAlgorithm(this.props.user.id, res.uri, () => {
+                    this.props.updatePlaying(res.uri);
+                    // Update cooldown
+                    let cooldown = Date.now();
+                    localStorage.setItem('weeklyCooldown', JSON.stringify(cooldown));
+
+                    // Animate out button
+                    let weekly = document.querySelector('.weekly');
+                    weekly.classList.add('weekly--bye');
+                });
             }
         })
-
-        // Update cooldown
-        let cooldown = Date.now();
-        localStorage.setItem('weeklyCooldown', JSON.stringify(cooldown));
-
-        // Animate out button
-        let weekly = document.querySelector('.weekly');
-        weekly.classList.add('weekly--bye');
     }
 
     weeklyButton() {
@@ -88,7 +95,7 @@ class SidePlaylist extends Component {
             return (
                 <div className="weekly">
                 <button className="weekly-button" onClick={this.handleWeekly.bind(this)}>Create weekly playlist</button>
-                <p>Only works for active users</p>
+                <p>Available for active users every 7 days</p>
                 </div>
             );
         }
@@ -111,7 +118,7 @@ class SidePlaylist extends Component {
                     );
                 })}
                 </div>
-                {/* {this.weeklyButton()} */}
+                { this.state.weeklyAvailable && this.weeklyButton() }
             </div>
         );
     }

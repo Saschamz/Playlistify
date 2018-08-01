@@ -38,7 +38,7 @@
   position: absolute;
   right: 0;
   top: 0;
-  transform: translate(100%, -25%);
+  transform: translate(105%, -25%);
 }
 
 .login-title > h1 {

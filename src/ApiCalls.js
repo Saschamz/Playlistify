@@ -77,6 +77,11 @@ api.createPlaylist = (user_id, artists) => {
     return this.spotify.createPlaylist(user_id, {name, description: this.descriptionString});
 };
 
+api.createPlaylistExplicit = (user_id, name) => {
+    console.log('Creating playlist: ', name);
+    return this.spotify.createPlaylist(user_id, {name, description: this.descriptionString});
+};
+
 api.getPlaylists = () => {
     return this.spotify.getUserPlaylists();
 }
@@ -323,11 +328,17 @@ api.cousinAlgorithm = (artist, user_id, playlist_id, callback, failure) => {
     })  
 }
 
+// Checks if users is eligable for weekly playlist
+api.weeklyAvailable = () => {
+    return this.spotify.getMyTopArtists();
+}
+
 // Weekly algorithm
 // User top artists > Related > Top tracks(1)
-api.weeklyAlgorithm = (user_id, playlist_id) => {
+api.weeklyAlgorithm = (user_id, playlist_id, callback, failure) => {
     playlist_id = playlist_id.split(':');
     playlist_id = playlist_id[playlist_id.length - 1];
+
     this.spotify.getMyTopArtists()
     .then((res, err) => {
         if(err) console.error(err);
@@ -346,17 +357,42 @@ api.weeklyAlgorithm = (user_id, playlist_id) => {
                 clearInterval(update);
 
                 allTracks.forEach((_, index) => {
-                    if(index !== 0 && index % 100 === 0) {
+                    if((index !== 0 && index % 100 === 0) && index !== allTracks.length - 1) {
                         let payload = allTracks.slice(index - 100, index);
                         this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                         .then((res, err) => {
                             if(err) console.error(err);
                         })
-                    } else if(index + 1 === allTracks.length) {
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    } else if(index === allTracks.length - 1) {
+                        // Send payload at maxlength
                         let payload = allTracks.slice(Math.floor(index / 100) * 100, index + 1);
                         this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
                         .then((res, err) => {
                             if(err) console.error(err);
+                            callback();
+                        })
+                        .catch(err => {
+                            // Error adding tracks
+                            setTimeout(() => {
+                                allTracks.forEach((_, index) => {
+                                    if(index !== 0 && index % 100 === 0) {
+                                        let payload = allTracks.slice(index - 100, index);
+                                        this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                                        .then((res, err) => {
+                                            if(err) console.error(err);
+                                        })
+                                    } else if(index + 1 === allTracks.length) {
+                                        let payload = allTracks.slice(Math.floor(index / 100) * 100, index + 1);
+                                        this.spotify.addTracksToPlaylist(user_id, playlist_id, payload)
+                                        .then((res, err) => {
+                                            if(err) console.error(err);
+                                            callback();
+                                        })
+                                    }})
+                            }, 5000);
                         })
                     }
                 });
@@ -368,7 +404,7 @@ api.weeklyAlgorithm = (user_id, playlist_id) => {
         artists.forEach(topArtist => {
             this.spotify.getArtistRelatedArtists(topArtist.id)
             .then((res, err) => {
-                if(err) console.error(err);
+                if(err) playlistLength -= 20;
                 let related = res.artists;
 
                 let _payload = [];
@@ -381,6 +417,7 @@ api.weeklyAlgorithm = (user_id, playlist_id) => {
                 });
 
                 _payload.forEach(artist => {
+                    let chill = (artist) => {
                     this.spotify.getArtistTopTracks(artist, 'SE')
                     .then((res, err) => {
                         if(err) --playlistLength;
@@ -390,9 +427,18 @@ api.weeklyAlgorithm = (user_id, playlist_id) => {
                         } else {
                             allTracks.push(track);
                         }
-                    });
+                    })
+                    .catch(e => {
+                        if(e) {
+                            console.log(e);
+                            if(e.status === 429) {
+                                setTimeout(() => chill(artist), 5000);
+                            }
+                        }
+                    })
+                    }
+                    chill(artist);
                 });
-
             });
         });
     });

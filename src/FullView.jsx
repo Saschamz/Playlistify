@@ -22,6 +22,7 @@ export default class FullView extends Component {
         .then((res, err) => {
             if(err) console.log(err);
             else this.setState({playing: this.state.playing, user: res});
+            console.log('uInfo', res);
         });
         this.transition = 300;
     }

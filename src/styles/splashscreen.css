@@ -132,7 +132,7 @@
 .player__container {
     height: 100%;
     width: 80%;
-    transform: translateX(10%);
+    margin: 0 auto;
 }
 
 .player__cover-art {
@@ -343,4 +343,11 @@
 
 .media-link:active {
     transform: scale(0.95);
+}
+
+.error-msg {
+    text-align: center;
+    margin-top: 10px;
+    color: hsla(0,0%,100%,.7);
+    font-size: 22px;
 }

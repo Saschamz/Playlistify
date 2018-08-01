@@ -166,7 +166,7 @@ export default class SplashScreen extends Component {
         return (
             <div className="splash-screen__grid">
                 <Statistics playlist={this.state.playlist} spotifyLink={this.spotifyLink} clipboard={this.clipboard}/>
-                <Player token={this.props.token} uri={this.props.playlistId} />
+                <Player token={this.props.token} uri={this.props.playlistId} premiumUser={this.props.premiumUser}/>
                 <div className="cover" style={{background: this.randomGradient()}}>
                     <div className="cover" style={{background: this.state.cover}}></div>
                 </div>

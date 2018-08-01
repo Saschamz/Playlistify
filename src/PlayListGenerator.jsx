@@ -161,6 +161,7 @@ export default class PlayListGenerator extends Component {
 
     renderPlayList() {
         return <SplashScreen 
+        premiumUser={this.props.user.product === 'premium'}
         token={this.props.token}
         playlistId={this.props.nowPlaying} 
         userId={this.props.user.id} />
