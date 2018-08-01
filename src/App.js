@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { svg } from './Svg';
 import FullView from './FullView';
+import { clientId } from './secrets';
 
 import $ from 'jquery';
 
@@ -38,7 +39,7 @@ class App extends Component {
 
   test() {
     function login(callback) {
-      var CLIENT_ID = 'e0ec0666abbe4d258cafddd3c622b045';
+      var CLIENT_ID = clientId;
       
       // Deployment
       var REDIRECT_URI = 'http://play-listify.herokuapp.com/';
