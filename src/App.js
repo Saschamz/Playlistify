@@ -41,7 +41,7 @@ class App extends Component {
       var CLIENT_ID = 'e0ec0666abbe4d258cafddd3c622b045';
       
       // Deployment
-      var REDIRECT_URI = 'http://myplaylistify.herokuapp.com/';
+      var REDIRECT_URI = 'http://play-listify.herokuapp.com/';
       
       // Development
       //var REDIRECT_URI = 'http://localhost:3000/';
